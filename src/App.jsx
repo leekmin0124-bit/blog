@@ -1,48 +1,44 @@
+import React, { useState } from 'react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { useState } from "react";
 
 function App() {
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState("");
+  const [data, setData] = useState(null);
 
-  const handleStartAnalysis = async () => {
+  const startAnalysis = async () => {
     setLoading(true);
-    setResult(""); // Clear previous results
     try {
-      const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+      // 1. API 연결 (본인의 키 사용)
+      const genAI = new GoogleGenerativeAI("AIzaSyA_FqOYwqUYuBIMgZaetk41w4AipPz1294");
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-      const prompt = "메인 키워드 '부업'에 대한 연관 키워드 5개, 경쟁도, 수익성을 표 형식으로 분석해줘.";
-      const response = await model.generateContent(prompt);
-
-      setResult(response.response.text());
-    } catch (err) {
-      console.error("실행 오류:", err);
-      alert("분석 중 오류가 발생했습니다. API 키 또는 네트워크 연결을 확인하세요.");
-    } finally {
-      setLoading(false);
+      // 2. 분석 실행
+      const prompt = "블로그 테크 키워드 3개와 각각의 경쟁강도를 표 형식으로 뽑아줘.";
+      const result = await model.generateContent(prompt);
+      
+      setData(result.response.text());
+    } catch (error) {
+      alert("분석 실패! 키를 확인하세요.");
     }
+    setLoading(false);
   };
 
   return (
-    <div style={{ padding: '20px', textAlign: 'center', fontFamily: 'sans-serif' }}>
-      <h2>Ai 키워드 마스터 V1.0</h2>
-
-      <button onClick={handleStartAnalysis}>
-        {loading ? "🚀 분석 로직 실행 중..." : "지금 시작하기"}
+    <div style={{ padding: '40px', textAlign: 'center', background: '#1a1a1a', color: 'white', minHeight: '100vh' }}>
+      <h1>Ai 키워드 마스터 V1.0</h1>
+      <p>강력한 키워드 분석 로직을 가동합니다.</p>
+      
+      <button 
+        onClick={startAnalysis} 
+        style={{ padding: '15px 40px', fontSize: '20px', cursor: 'pointer', background: '#00d1b2', border: 'none', borderRadius: '10px', fontWeight: 'bold' }}
+      >
+        {loading ? "📡 데이터 스캔 중..." : "지금 시작하기"}
       </button>
 
-      {loading && (
-        <div style={{ marginTop: '30px' }}>
-          <p>AI가 데이터를 분석하고 있습니다. 잠시만 기다려주세요...</p>
-        </div>
-      )}
-
-      {result && !loading && (
-        <div style={{ marginTop: '30px', textAlign: 'left', background: '#f8f9fa', padding: '20px', borderRadius: '15px', border: '2px solid #28a745' }}>
-          <h3 style={{ color: '#28a745' }}>✅ 분석 완료!</h3>
-          <pre style={{ whiteSpace: 'pre-wrap', lineHeight: '1.6', fontFamily: 'monospace' }}>{result}</pre>
-          <button onClick={() => setResult("")} style={{ marginTop: '10px' }}>다시 분석하기</button>
+      {data && (
+        <div style={{ marginTop: '30px', background: '#333', padding: '20px', borderRadius: '10px', textAlign: 'left', border: '1px solid #00d1b2' }}>
+          <h3>✅ 분석 완료</h3>
+          <pre style={{ whiteSpace: 'pre-wrap' }}>{data}</pre>
         </div>
       )}
     </div>
