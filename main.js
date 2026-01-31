@@ -1,8 +1,6 @@
 import { GoogleGenerativeAI } from "https://cdn.jsdelivr.net/npm/@google/generative-ai";
 
-// WARNING: Directly exposing API keys in client-side code is INSECURE.
-// For production, use a backend proxy or server-side environment variables.
-const GEMINI_API_KEY = "AIzaSyA_FqOYwqUYuBIMgZaetk41w4AipPz1294";
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
